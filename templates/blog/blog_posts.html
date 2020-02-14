@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}User Posts{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+            <div class="text-center mb-3 p-0">
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                    Review Comments
+                </a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="card card-body">
+        <div class="text-center">
+            <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#livePosts"
+                    aria-expanded="false" aria-controls="livePosts" style="width: 120px">
+                Live Posts
+            </button>
+
+            <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#hiddenPosts"
+                    aria-expanded="false" aria-controls="hiddenPosts" style="width: 120px">
+                Hidden Posts
+            </button>
+        </div>
+
+        <div class="collapse" id="livePosts">
+            <br>
+            <h3>Live Posts:</h3>
+            {% for object in live_posts %}
+                {% include 'blog/blog_posts_template.html' %}
+            {% empty %}
+                <h5 class="text-center">No Posts Here!</h5>
+            {% endfor %}
+        </div>
+
+        <div class="collapse" id="hiddenPosts">
+            <br>
+            <h3>Hidden Posts:</h3>
+            {% for object in hidden_posts %}
+                {% include 'blog/blog_posts_template.html' %}
+            {% empty %}
+                <h5 class="text-center">No Posts Here!</h5>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock content %}

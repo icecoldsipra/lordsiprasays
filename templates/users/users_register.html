@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container p-0" style="max-width: 500px;">
+        <div class="card">
+            <h5 class="card-header text-center" id="cardHeader" style="background-color: yellow">Register Page</h5>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                    </div>
+                    <div class="form-group text-center">
+                        <button class="btn btn-outline-info" type="submit">Sign Up</button>
+                    </div>
+                    <hr>
+                    <div class="text-center my-1">
+                        Already Have an Account?
+                        <a href="{% url 'users-login' %}">Log In</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% include 'users/validate_email_modal.html' %}
+
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+        // $('#loginModal').modal('show');
+        $("#id_email").change(function () {
+            var email = $(this).val();
+
+            $.ajax({
+                url: "{% url 'validate-email' %}",
+                dataType: 'json',
+                data: {
+                    'email': email
+                },
+
+                success: function (data) {
+                    if (data.is_taken) {
+                        $('#registerModal').modal('show');
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock javascript %}

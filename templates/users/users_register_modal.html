@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div>
+        <!-- The Modal -->
+        <div class="modal fade" id="signupModal" role="dialog">
+            <form method="POST" id="signup-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Register Form</h4>
+                            <button type="button" class="close " data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                                {{ form|crispy }}
+                        
+
+                            <div class="form-group text-center">
+                                <button class="btn btn-success" id="signupBtn" type="submit">Sign Up</button>
+                            </div>
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <div class="text-left">
+                                Already Have an Account?
+                                <a href="{% url 'users-login' %}">Log In</a>
+                            </div>
+                            <button type="button" id="btnClose" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include 'users/validate_email_modal.html' %}
+
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+
+        $(document).ready(function(){
+            // Trigger the Contact modal manually
+            $('#signupModal').modal('show');
+
+            // Redirect to previous page when user clicks close button
+            $('#btnClose').on('click', function() {
+                window.history.back();
+            });
+
+            // Dynamically validate if email ID exists and notify user if it does
+            $("#id_email").change(function () {
+                let email = $(this).val();
+
+                $.ajax({
+                    url: "{% url 'validate-email' %}",
+                    dataType: 'json',
+                    data: {
+                        'email': email
+                    },
+
+                    success: function (data) {
+                        if (data.is_taken) {
+                            // $("#id_email").css({ "border": '#FF0000 3px solid'});
+                            $('#registerModal').modal('show');
+                        }
+                    }
+                });
+            });
+
+            // Dynamically validate if nickname exists and notify user if it does
+            $("#id_nickname").change(function () {
+                let nickname = $(this).val();
+
+                $.ajax({
+                    url: "{% url 'validate-nickname' %}",
+                    dataType: 'json',
+                    data: {
+                        'nickname': nickname
+                    },
+
+                    success: function (data) {
+                        if (data.is_taken) {
+                            $('#registerModal').modal('show');
+                        }
+                    }
+                });
+            });
+
+            // capture the send button
+            let btn = $('#signupBtn');
+
+            $('#signup-form').on('submit', function(event){
+                // event.preventDefault();
+
+                $.ajax({
+                    url: '/users/register/',
+                    type: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: $('#signup-form').serialize(),
+                    
+                    beforeSend: function () {
+                        btn.html("Sending...")
+                        btn.removeClass("btn-success");
+                        btn.addClass("btn-primary");
+                    },
+
+                    success: function(response) {
+                        
+                    },
+
+                    completed: function() {
+                        $('#signupModal').modal('hide');
+                        $('#signup-form').trigger("reset");
+                        btn.html("Sign Up");
+                        btn.removeClass("btn-primary");
+                        btn.addClass("btn-success");
+
+                        // $('#contactSubmit').on('click', function() {
+                        //     window.history.back();
+                        // });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock javascript %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Contact Us{% endblock title %}
+
+{% block content %}
+    <div>
+        <div class="text-center mb-1">
+            <legend>Contact Us</legend>
+            <hr>
+        </div>
+        <form method="POST" id="contact-form" enctype="multipart/form-data">
+            <div class="form-group">
+                {% csrf_token %}
+                {{ form|crispy }}
+            </div>
+            <hr>
+            <div class="text-center my-1">
+                <button class="btn btn-outline-success" type="submit">Submit</button>
+                <a class="btn btn-outline-info ml-2" type="button" href="{% url 'blog-home' %}">Home</a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

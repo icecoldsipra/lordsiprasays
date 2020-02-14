@@ -1,0 +1,12 @@
+<div class="list-group">
+    <a href="{% url 'blog-detail' object.slug %}" class="list-group-item list-group-item-action border-dark mb-3 p-2"
+       style="background-color: lightyellow">
+        <h5 class="mb-1 text-left">{{ object.title }}</h5>
+        <small>
+            <strong>Author:</strong> {{ object.author }} |
+            <strong>Posted:</strong> {{ object.date_posted }} |
+            <strong>Views:</strong> {{ object.views }} |
+            <strong>Comments:</strong> {{ object.comments }}
+        </small>
+    </a>
+</div>

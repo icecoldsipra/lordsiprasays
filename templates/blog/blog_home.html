@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog- Home{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+            <div class="text-center mb-3 p-0">
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                    Review Comments
+                </a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div>
+        {% for object in object_list %}
+            <div class="list-group">
+                <a href="{% url 'blog-detail' object.slug %}" class="list-group-item list-group-item-action border-dark mb-3 p-2"
+                style="background-color: lightyellow">
+                    <h5 class="mb-1 text-left">{{ object.title }}</h5>
+                    <small>
+                        <strong>Author:</strong> {{ object.author }} |
+                        <strong>Posted:</strong> {{ object.date_posted }} |
+                        <strong>Views:</strong> {{ object.views }} |
+                        <strong>Comments:</strong> {{ object.comments }}
+                    </small>
+                    <hr class="m-1 p-0">
+                    <p class="mb-1">{{ object.content|truncatechars:100 }}</p>
+                </a>
+            </div>
+        {% empty %}
+            <div class="text-center mt-4">
+                <h5>No Posts Live!</h5>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock content %}

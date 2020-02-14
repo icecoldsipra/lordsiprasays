@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} {{ post.title}} {% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+            <div class="text-center mb-3 p-0">
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+
+                {% if post.author == request.user %}
+                    <a class="btn btn-sm btn-outline-warning" href="{% url 'blog-update' post.slug %}" type="submit">
+                        Update Post
+                    </a>
+                {% endif %}
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                    Review Comments
+                </a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header text-center" style="background-color: #7a68a6; color: white;">
+            <h3 class="card-title">{{ post.title }}</h3>
+            <small>
+                <strong>Author:</strong> {{ post.author }} |
+                <strong>Posted:</strong> {{ post.date_posted }} |
+                <strong>Views:</strong> {{ post.views }} |
+                <strong>Comments: </strong>{{ comments_count }}
+            </small>
+        </div>
+
+        <div class="card-body" style="background-color: lightyellow;">
+            {% if post.image %}
+                <div class="col d-flex justify-content-center align-items-center h100 mb-3 p-0">
+                    <img src="{{ post.image.url }}"/>
+                </div>
+            {% endif %}
+
+            <div class="card-text">
+                {{ post.content|linebreaksbr }}
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div>
+                <strong>Comment Section:</strong>
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="card card-body mt-2 mb-3">
+                        <div class="form-group mb-0">
+                            {% csrf_token %}
+                            <div class="form-row p-0">
+                                <div class="form-group col-md-6 mb-0">
+                                    {{ form.name|as_crispy_field }}
+                                </div>
+                                <div class="form-group col-md-6 mb-0">
+                                    {{ form.email|as_crispy_field }}
+                                </div>
+                            </div>
+                            <div class="form-row p-0">
+                                <div class="form-group">
+                                    {{ form.content|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="my-1">
+                        <button class="btn btn-sm btn-outline-success" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+
+            <hr>
+
+            <div>
+                <strong>{{ comments_count }} Comment{{ comments|pluralize }}</strong>
+
+                <br><br>
+
+                {% for object in comments %}
+                    <blockquote class="blockquote border p-2" style="font-size: medium; background-color: ghostwhite">
+                        <p>{{ object.content|linebreaksbr }}</p>
+                        <footer class="blockquote-footer">by <cite title="Source Title">{{ object.name|capfirst }} at {{ object.timestamp }}</cite></footer>
+                    </blockquote>
+                {% empty %}
+                    <div>
+                        No comments at the moment!
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}

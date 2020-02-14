@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Post{% endblock title %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-header text-center" style="background-color: #7a68a6; color: white;">
+            <h3 class="card-title">Update Post</h3>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card-body" style="background-color: lightyellow;">
+                <div class="form-group">
+                    {{ form|crispy }}
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-center my-1">
+                    <button class="btn btn-outline-success" type="submit">Save</button>
+                    {% if post.is_live %}
+                        <button class="btn btn-outline-warning ml-2" id="publish" type="submit"
+                        href="{% url 'blog-home' %}">
+                            Publish
+                        </button>
+                    {% else %}
+                        <button class="btn btn-outline-warning ml-2" id="publish" type="submit"
+                        href="{% url 'blog-home' %}" disabled>
+                            Publish
+                        </button>
+                    {% endif %}
+                    <a class="btn btn-outline-info ml-2" type="submit" href="{% url 'blog-home' %}">Home</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+        document.getElementById("id_is_live").addEventListener("click", toggleBtn);
+
+        function toggleBtn() {
+            const formValue = document.getElementById('id_is_live').checked;
+            const btn = document.getElementById('publish');
+            if (formValue){
+                btn.removeAttribute('disabled');
+            } else{
+                btn.setAttribute('disabled', 'disabled');
+            }
+        }
+    </script>
+{% endblock javascript %}

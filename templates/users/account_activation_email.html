@@ -1,0 +1,15 @@
+{% autoescape off %}
+    Hi {{ user.get_short_name|capfirst }},
+
+    <p>Thank you for signing up with LordSipraSays. Please click on the link below or simply copy and paste the url in your web browser to complete the verifcation process.</p>
+
+    <p>http://{{ domain }}{% url 'users-activate' uidb64=uid token=token %}</p>
+
+    <p><strong>Important:</strong> If your e-mail is not verified within 7 days, it will be deactivated automatically.</p>
+
+    <p>
+        Thanks, <br>
+        Blog Manager
+    </p>
+
+{% endautoescape %}

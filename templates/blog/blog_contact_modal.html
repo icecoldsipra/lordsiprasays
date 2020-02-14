@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div>
+        <!-- The Modal -->
+        <div class="modal fade" id="contactModal" role="dialog">
+            <form method="POST" id="contact-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Contact Form</h4>
+                            <button type="button" class="close " data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            {{ form|crispy }}
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="contactSubmit" class="btn btn-success">Send</button>
+                            <button type="button" id="btnClose" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function(){
+            // Trigger the Contact modal manually
+            $('#contactModal').modal('show');
+
+            // Redirect to previous page when user clicks close button
+            $('#btnClose').on('click', function() {
+                window.history.back();
+            });
+
+            // capture the send button
+            let sendBtn = $('#contactSubmit');
+
+            $('#contact-form').on('submit', function(event){
+                // event.preventDefault();
+
+                $.ajax({
+                    url: '/contact/',
+                    type: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: $('#contact-form').serialize(),
+                    
+                    beforeSend: function () {
+                        sendBtn.html("Sending...")
+                        sendBtn.removeClass("btn-success");
+                        sendBtn.addClass("btn-primary");
+                    },
+
+                    success: function(response) {
+                        
+                    },
+
+                    completed: function() {
+                        $('#contactModal').modal('hide');
+                        $('#contact-form').trigger("reset");
+                        sendBtn.html("Send");
+                        sendBtn.removeClass("btn-primary");
+                        sendBtn.addClass("btn-success");
+
+                        // $('#contactSubmit').on('click', function() {
+                        //     window.history.back();
+                        // });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock javascript %}

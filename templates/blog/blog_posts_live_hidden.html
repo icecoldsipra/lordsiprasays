@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Posts{% endblock title %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
+            <div class="text-center">
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+            </div>
+            <hr class="p-0">
+        {% endif %}
+    {% endif %}
+
+    <h3>Live Posts ({{ object_list_count }})</h3>
+    <hr>
+    {% for object in object_list %}
+        {% include 'blog/blog_posts_template.html' %}
+    {% empty %}
+        <h5>No Posts Here!</h5>
+    {% endfor %}
+{% endblock content %}

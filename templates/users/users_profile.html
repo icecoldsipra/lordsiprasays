@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="container p-0" style="max-width: 500px;">
+        <div class="text-center mb-3">
+            <legend class="border-bottom mb-4">Profile Info</legend>
+            <img src="{{ user.image.url }}" width="320px" height="240px"/>
+        </div>
+        <div>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                </div>
+                <div class="border-top text-center my-4 pt-3">
+                    <button class="btn btn-outline-success" type="submit">Update</button>
+                    <a class="btn btn-outline-info ml-2" type="submit" href="{% url 'blog-home' %}">Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

@@ -7,21 +7,21 @@
                 </div>
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user.is_superuser %}
-                        <div class="col p-0 ml-1">
+                        <div class="col p-0 ml-2">
                             <a class="nav-item nav-link" href="{% url 'blog-posts' %}">My Posts</a>
                         </div>
-                        <div class="col p-0 ml-1">
+                        <div class="col p-0 ml-2">
                             <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
                         </div>
                     {% endif %}
-                    <div class="col p-0 ml-1">
+                    <div class="col p-0 ml-2">
                         <a class="nav-item nav-link" href="{% url 'users-logout' %}">Logout</a>
                     </div>
                 {% else %}
-                    <div class="col p-0 ml-1">
+                    <div class="col p-0 ml-2">
                         <a class="nav-item nav-link" href="{% url 'users-login' %}">Login</a>
                     </div>
-                    <div class="col p-0 ml-1">
+                    <div class="col p-0 ml-2">
                         <a class="nav-item nav-link" href="{% url 'users-register' %}">Register</a>
                     </div>
                 {% endif %}

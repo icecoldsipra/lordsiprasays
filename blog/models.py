@@ -6,7 +6,7 @@ from .managers import PostManager, CommentManager
 
 
 class Category(models.Model):
-    tag = models.CharField(max_length=25)
+    tag = models.CharField(max_length=100)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -16,7 +16,7 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField(null=True, blank=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
     tags = models.ManyToManyField(Category, default=None, blank=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     image = models.ImageField(max_length=255, upload_to='blog', default='', blank=True)

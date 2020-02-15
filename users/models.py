@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
+from django.utils import timezone
 from django.shortcuts import reverse
 from django.utils.text import slugify
 from .managers import CustomUserManager
@@ -22,7 +23,7 @@ class CustomUser(AbstractBaseUser):
     is_active = models.BooleanField("Is Active", default=True)  # Can login
     is_staff = models.BooleanField("Is Staff", default=False)  # Admin but non-superuser
     is_superuser = models.BooleanField("Is Superuser", default=False)  # Superuser
-    date_joined = models.DateTimeField("Date Joined", auto_now_add=True)  # Sets value to current date and time
+    date_joined = models.DateTimeField("Date Joined", default=timezone.now)  # Sets value to current date and time
 
     class Meta:
         verbose_name = 'Registered User'

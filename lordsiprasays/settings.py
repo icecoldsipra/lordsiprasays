@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get('DJANGO_DEBUG'))
+DEBUG = False
 
 if not DEBUG:
     # To avoid transmitting the CSRF cookie over HTTP accidentally
@@ -26,7 +26,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Ensures user is logged out after 24 hours
 SESSION_COOKIE_AGE = 86400
 
-ALLOWED_HOSTS = ['lordsiprasays.pythonanywhere.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['lordsiprasays.pythonanywhere.com', 'lordsiprasays.herokuapp.com', '127.0.0.1', 'localhost']
 
 # Application definition
 

@@ -70,7 +70,7 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
     model = CustomUser
     template_name = 'users/users_register_modal.html'
     form_class = CustomUserCreationForm
-    success_message = "An email has been sent to your email ID '%(email)s' for verification."
+    # success_message = "An email has been sent to your email ID '%(email)s' for verification."
     success_url = reverse_lazy('users-login')
 
     def form_valid(self, form):
@@ -139,7 +139,7 @@ class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
     # To ensure that only the logged in user has access to his content
     def test_func(self):
         obj = self.get_object()
-        if self.request.user.nickname == obj.nickname:
+        if self.request.user.username == obj.username:
             return True
         return False
 
@@ -183,12 +183,12 @@ def validate_email(request):
 
     return JsonResponse(data)
 
-def validate_nickname(request):
-    nickname = request.GET.get('nickname')
+def validate_username(request):
+    username = request.GET.get('username')
 
     data = {
         'status': 200,
-        'is_taken': CustomUser.objects.filter(nickname__iexact=nickname).only('nickname').exists()
+        'is_taken': CustomUser.objects.filter(username__iexact=username).only('username').exists()
     }
 
     return JsonResponse(data)

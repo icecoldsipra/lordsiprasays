@@ -1,5 +1,5 @@
 import os
-import django_heroku
+# import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if not DEBUG:
     # To avoid transmitting the CSRF cookie over HTTP accidentally
@@ -99,12 +99,13 @@ WSGI_APPLICATION = 'lordsiprasays.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -137,7 +138,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Useful for django-admin-honeypot to trigger notification emails
+# Useful to trigger notification emails
 ADMINS = [
     ("", os.environ.get('PERSONAL_EMAIL')),
 ]
@@ -211,4 +212,4 @@ LOGGING = {
 }
 
 # Activate Django-Heroku.
-django_heroku.settings(locals(), logging=False)
+# django_heroku.settings(locals(), logging=False)

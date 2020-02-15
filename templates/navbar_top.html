@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container p-0" style="max-width: 800px;">
-        <a class="navbar-brand text-capitalize" href="{{ user.get_absolute_url }}">
+        <a class="navbar-brand" href="{{ user.get_absolute_url }}">
             {% if user.is_authenticated %}
-                {{ user.get_nickname }}
+                {{ user.get_username }}
             {% else %}
                 User
             {% endif %}

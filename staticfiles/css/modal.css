@@ -1,0 +1,15 @@
+.modal-header, h4, .close {
+    background-color: #7a68a6;
+    color:white !important;
+    font-size: larger;
+}
+
+.modal-body {
+    font-size: medium;
+    background-color: lightyellow;
+}
+
+.modal-footer {
+    font-size: medium;
+    background-color: white;
+}

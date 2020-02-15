@@ -22,11 +22,11 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'pk', 'content', 'post', 'post_owner', 'status', 'timestamp', 'reviewed_by',
+    list_display = ['owner', 'pk', 'content', 'post', 'status', 'timestamp', 'reviewed_by',
                     'review_time', 'review_notes']
-    list_filter = ['post', 'post_owner', 'status']
-    search_fields = ['post', 'post_owner']
-    readonly_fields = ['name', 'email', 'post', 'post_owner', 'timestamp', 'reviewed_by', 'review_time']
+    list_filter = ['owner', 'post', 'status']
+    search_fields = ['owner', 'post']
+    readonly_fields = ['owner', 'post', 'timestamp', 'reviewed_by', 'review_time']
     ordering = ['-timestamp']
 
 

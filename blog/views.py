@@ -160,7 +160,7 @@ def post_detail(request, slug):
     # Get post
     post = get_object_or_404(Post.objects.select_related("author"), slug=slug)
     # Extract all approved comments for the specific post
-    comments = Comment.objects.select_related("post", "post_owner").filter(post=post, status='APPROVED').order_by('timestamp')
+    comments = Comment.objects.select_related("post", "owner").filter(post=post, status='APPROVED').order_by('timestamp')
 
     # Comment form
     if request.method == 'POST':
@@ -172,14 +172,15 @@ def post_detail(request, slug):
             # Assign the current post to the comment
             obj.post = post
             # Assign post author to the comment
-            obj.post_owner = post.author
+            obj.owner = post.author
             # Save the comment to the database
             if obj.content:
                 # Save comment to database
                 obj.save()
                 messages.success(
                     request,
-                    "Your comment has been sent to Moderator for review. It will be published if approved."
+                    # "Your comment has been sent to Moderator for review. It will be published if approved."
+                    "Your comment was posted successfully."
                 )
 
             # Reduce view count by one to avoid treating page redirect at time of submitting comment as 1 view
@@ -253,6 +254,10 @@ def post_update(request, slug):
                     messages.warning(request, "Your post was saved as draft as content is empty.")
                 else:
                     messages.warning(request, "Your post was saved as draft successfully.")
+
+            if obj.is_live:
+                obj.views -= 1
+                
             obj.save()
             # Redirect user back to the post-detail page
             return redirect('blog-detail', slug=slug)
@@ -273,9 +278,9 @@ def post_update(request, slug):
 
 
 def user_comments(request):
-    approved = Comment.objects.select_related("post", "post_owner").approved_comments().order_by('-timestamp')
-    pending = Comment.objects.select_related("post", "post_owner").pending_comments().order_by('-timestamp')
-    reject = Comment.objects.select_related("post", "post_owner").rejected_comments().order_by('-timestamp')
+    approved = Comment.objects.select_related("post", "owner").approved_comments().order_by('-timestamp')
+    pending = Comment.objects.select_related("post", "owner").pending_comments().order_by('-timestamp')
+    reject = Comment.objects.select_related("post", "owner").rejected_comments().order_by('-timestamp')
 
     template = 'blog/blog_comments.html'
     context = {

@@ -45,34 +45,33 @@
         </div>
 
         <div class="card-footer">
-            <div>
-                <strong>Comment Section:</strong>
-
+            <div class="card card-body mt-2 mb-3">
                 <form method="POST" enctype="multipart/form-data">
-                    <div class="card card-body mt-2 mb-3">
-                        <div class="form-group mb-0">
-                            {% csrf_token %}
-                            <div class="form-row p-0">
-                                <div class="form-group col-md-6 mb-0">
-                                    {{ form.name|as_crispy_field }}
+                    {% csrf_token %}
+
+                    {% if user.is_authenticated %}
+                        <div>
+                            <div class="form-group mb-0">
+                                <div class="form-row p-0">
+                                    {{ form|crispy }}
                                 </div>
-                                <div class="form-group col-md-6 mb-0">
-                                    {{ form.email|as_crispy_field }}
-                                </div>
-                            </div>
-                            <div class="form-row p-0">
-                                <div class="form-group">
-                                    {{ form.content|as_crispy_field }}
+                                <div>
+                                    <button class="btn btn-sm btn-outline-success" type="submit">Submit</button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="my-1">
-                        <button class="btn btn-sm btn-outline-success" type="submit">Submit</button>
-                    </div>
+                    {% else %}
+                        <div class='text-center'>
+                            <strong>Please login to leave a comment!</strong>
+                            <div class="mt-2">
+                                <a href="{% url 'users-login' %}?next={% firstof request.path '/' %}">
+                                    <button class="btn btn-sm btn-outline-success" type="button">Login</button>
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
                 </form>
             </div>
-
             <hr>
 
             <div>
@@ -81,9 +80,18 @@
                 <br><br>
 
                 {% for object in comments %}
-                    <blockquote class="blockquote border p-2" style="font-size: medium; background-color: ghostwhite">
+                    <blockquote class="blockquote border p-2" style="font-size: medium;">
                         <p>{{ object.content|linebreaksbr }}</p>
-                        <footer class="blockquote-footer">by <cite title="Source Title">{{ object.name|capfirst }} at {{ object.timestamp }}</cite></footer>
+                        <footer class="blockquote-footer">
+                            by
+                            <cite title="Source Title">
+                                {{ object.owner }} at {{ object.timestamp }}
+                            </cite>
+                            <div class='text-right'>
+                                <button class='btn btn-sm btn-outline-secondary'>Edit</button>
+                                <button class='btn btn-sm btn-outline-danger'>Delete</button>
+                            </div>
+                        </footer>
                     </blockquote>
                 {% empty %}
                     <div>

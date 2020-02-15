@@ -13,7 +13,7 @@ from.views import (
     UserPasswordResetCompleteView,
     users_activate,
     validate_email,
-    validate_nickname,
+    validate_username,
 )
 
 urlpatterns = [
@@ -31,5 +31,5 @@ urlpatterns = [
          name='password-reset-confirm'),
     path('password_reset/complete/', UserPasswordResetCompleteView.as_view(), name='password-reset-complete'),
     path('ajax/validate_email/', validate_email, name='validate-email'),
-    path('ajax/validate_nickname/', validate_nickname, name='validate-nickname'),
+    path('ajax/validate_username/', validate_username, name='validate-username'),
 ]

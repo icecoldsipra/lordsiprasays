@@ -12,7 +12,7 @@
                         <!-- Modal Header -->
                         <div class="modal-header">
                             <h4 class="modal-title">Register Form</h4>
-                            <button type="button" class="close " data-dismiss="modal">&times;</button>
+                            <button type="button" id="btnClose" class="close " data-dismiss="modal">&times;</button>
                         </div>
 
                         <!-- Modal body -->
@@ -52,6 +52,7 @@
 
             // Redirect to previous page when user clicks close button
             $('#btnClose').on('click', function() {
+                $('#signup-form').trigger("reset");
                 window.history.back();
             });
 
@@ -69,25 +70,29 @@
                     success: function (data) {
                         if (data.is_taken) {
                             // $("#id_email").css({ "border": '#FF0000 3px solid'});
+                            let msg = "A user with email ID '" + email + "' already exists. Please choose another one.";
+                            $('#registerModal .modal-body').html(msg);
                             $('#registerModal').modal('show');
                         }
                     }
                 });
             });
 
-            // Dynamically validate if nickname exists and notify user if it does
-            $("#id_nickname").change(function () {
-                let nickname = $(this).val();
+            // Dynamically validate if username exists and notify user if it does
+            $("#id_username").change(function () {
+                let username = $(this).val();
 
                 $.ajax({
-                    url: "{% url 'validate-nickname' %}",
+                    url: "{% url 'validate-username' %}",
                     dataType: 'json',
                     data: {
-                        'nickname': nickname
+                        'username': username
                     },
 
                     success: function (data) {
                         if (data.is_taken) {
+                            let msg = "A user with username '" + username + "' already exists. Please choose another one.";
+                            $('#registerModal .modal-body').html(msg);
                             $('#registerModal').modal('show');
                         }
                     }
@@ -122,6 +127,7 @@
                         btn.html("Sign Up");
                         btn.removeClass("btn-primary");
                         btn.addClass("btn-success");
+
 
                         // $('#contactSubmit').on('click', function() {
                         //     window.history.back();

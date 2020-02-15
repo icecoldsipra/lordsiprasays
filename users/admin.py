@@ -10,7 +10,7 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm  # To update user details
     add_form = CustomUserCreationForm  # To create new user
 
-    list_display = ('nickname', 'pk', 'email', 'slug', 'first_name', 'last_name', 'country', 'date_joined', 'email_sent',
+    list_display = ('username', 'pk', 'email', 'slug', 'first_name', 'last_name', 'country', 'date_joined', 'email_sent',
                     'activation_deadline', 'activation_date', 'ip_address', 'user_agent', 'last_login', 'is_active',
                     'is_staff', 'is_superuser')
 
@@ -18,7 +18,7 @@ class CustomUserAdmin(UserAdmin):
 
     # Break down how various fields appear in the Admin panel
     fieldsets = (
-        (None, {'fields': ('nickname', 'email', 'slug', 'ip_address', 'user_agent', 'date_joined', 'last_login')}),
+        (None, {'fields': ('username', 'email', 'slug', 'ip_address', 'user_agent', 'date_joined', 'last_login')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'country')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
     )
@@ -27,11 +27,11 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('nickname', 'email', 'first_name', 'last_name', 'password1', 'password2')}
+            'fields': ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')}
         ),
     )
 
-    search_fields = ('nickname', 'email', 'first_name', 'last_name', 'country')  # Add search bar in Admin panel
+    search_fields = ('username', 'email', 'first_name', 'last_name', 'country')  # Add search bar in Admin panel
     ordering = ['-date_joined']  # Sort in descending order
     filter_horizontal = ()
 

@@ -62,13 +62,11 @@ COMMENT_CHOICES = (
 
 
 class Comment(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    post_owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    content = models.TextField("Comments:", null=True, blank=True,
+    content = models.TextField("Comment:", null=True, blank=True,
         help_text="Comments are moderated. Only those approved by the Moderator will be shown here.")
-    status = models.CharField(max_length=10, choices=COMMENT_CHOICES, default="PENDING")
+    status = models.CharField(max_length=10, choices=COMMENT_CHOICES, default="APPROVED")
     timestamp = models.DateTimeField(auto_now_add=True)
     reviewed_by = models.CharField(max_length=100, blank=True)
     review_time = models.DateTimeField(default=None, null=True, blank=True)
@@ -81,7 +79,7 @@ class Comment(models.Model):
         verbose_name_plural = 'Comments'
 
     def __str__(self):
-        return f"{self.name} : {self.post}"
+        return self.owner
 
 
 class Contact(models.Model):

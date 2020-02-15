@@ -7,8 +7,8 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser):
-    nickname = models.CharField("Nickname", unique=True, max_length=25, help_text="Enter a nickname")
-    email = models.EmailField("Email", unique=True, max_length=100, help_text="Enter Valid Email ID")
+    username = models.CharField("Username", unique=True, max_length=25, help_text="Enter a username. It should be unique")
+    email = models.EmailField("Email", unique=True, max_length=100, help_text="Enter Valid Email ID. It should be unique")
     first_name = models.CharField("First Name", max_length=255, help_text="Enter Your First Name")
     last_name = models.CharField("Last Name", max_length=255, blank=True, default='', help_text="Enter Your Last Name")
     slug = models.SlugField("Slug", unique=True, max_length=255, default='')
@@ -31,7 +31,7 @@ class CustomUser(AbstractBaseUser):
 
     # Username and password are required by default
     # set email as the default username for authentication
-    USERNAME_FIELD = 'nickname'
+    USERNAME_FIELD = 'username'
     # Can add additional fields which will be asked during superuser creation
     # These fields should also be included in the create_user() function in CustomUserManager class
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
@@ -51,8 +51,8 @@ class CustomUser(AbstractBaseUser):
         if self.first_name:
             return self.first_name
     
-    def get_nickname(self):
-        return self.nickname
+    def get_username(self):
+        return self.username
 
     def has_perm(self, perm, obj=None):
         """

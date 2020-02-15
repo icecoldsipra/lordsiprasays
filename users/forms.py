@@ -6,7 +6,7 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         # Add any required additional fields required for signup.
-        fields = ('nickname', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
 
 
 class CustomUserChangeForm(UserChangeForm):
@@ -14,4 +14,4 @@ class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ('nickname', 'first_name', 'last_name', 'image')
+        fields = ('username', 'first_name', 'last_name', 'image')

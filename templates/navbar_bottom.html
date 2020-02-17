@@ -1,8 +1,8 @@
 <nav class="navbar navbar-bottom fixed-bottom navbar-expand-sm navbar-dark bg-dark">
-    <div class="container p-0">
+    <div class="container p-0" style="max-width: 800px;">
         <div class="navbar-nav text-capitalize mx-auto" style="white-space: nowrap">
             <div class="row">
-                <div class="col p-0">
+                <div class="col px-1">
                     <a class="nav-item nav-link" href="{% url 'blog-home' %}">Home</a>
                 </div>
                 {% if user.is_authenticated %}

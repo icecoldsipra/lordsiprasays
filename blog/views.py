@@ -6,7 +6,6 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from .models import Post, Comment, Contact, PostViewCount
-from users.models import UserLocation
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -16,20 +15,24 @@ from django.contrib import messages
 from users.views import get_user_location
 
 
+"""
 class BlogListView(ListView):
     model = Post
     template_name = 'blog/blog_home.html'
     queryset = Post.objects.select_related("author").live_posts().order_by('-date_posted')
+"""
 
 
 def blog_home(request):
     template = 'blog/blog_home.html'
+    object_list = Post.objects.select_related("author").live_posts().order_by('-date_posted')
     context = {
-        'object_list':  Post.objects.select_related("author").live_posts().order_by('-date_posted')
+        'object_list': object_list
     }
     return render(request, template, context)
 
 
+"""
 class PostListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'blog/blog_posts.html'
@@ -46,6 +49,7 @@ class PostListView(LoginRequiredMixin, ListView):
         context['hidden_posts_count'] = hidden_posts.count()
 
         return context
+"""
 
 
 @login_required
@@ -93,7 +97,6 @@ class HiddenPostListView(LoginRequiredMixin, ListView):
         context['object_list'] = object_list
         context['object_list_count'] = object_list.count()
         return context
-"""
 
 
 class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -117,6 +120,7 @@ class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         # Finally, save post details to database
         post.save()
         return super().form_valid(form)
+"""
 
 
 @login_required
@@ -165,6 +169,7 @@ def record_view(request, obj=None, slug=None):
             post=obj,
             ip=get_user_location(request)['ip'],
             country=get_user_location(request)['country'],
+            city=get_user_location(request)['city'],
             timestamp=timezone.now()
         )
 

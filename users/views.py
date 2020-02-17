@@ -4,8 +4,8 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import CustomUser
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import CustomUser, UserLocation
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.utils.encoding import force_bytes, force_text
@@ -27,6 +27,8 @@ def get_user_location(request):
     This function captures the user's IP Address,User-Agent and Region at the time of signup
     """
     values = {}
+
+    # Get IP Address of user
     try:
         x_forward = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forward:
@@ -36,22 +38,32 @@ def get_user_location(request):
     except:
         ip = ""
 
+    # Get User Agent of user
     try:
         user_agent = request.META.get("HTTP_USER_AGENT")
     except:
         user_agent = ""
 
+    # Trace user location using Geoip API
     from django.contrib.gis.geoip2 import GeoIP2
-    try:
-        g = GeoIP2()
-        country = g.country_name(ip)
+    g = GeoIP2()
 
+    # Get Country of user
+    try:
+        country = g.country_name(ip)
     except:
         country = ""
+
+    # Get City of user
+    try:
+        city = g.city(ip)['city']
+    except:
+        city = ""
 
     values['ip'] = ip
     values['user_agent'] = user_agent
     values['country'] = country
+    values['city'] = city
 
     return values
 
@@ -77,14 +89,22 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
+        # Set email verification deadline as 7 days from registraton date
         user.activation_deadline = timezone.now() + timezone.timedelta(days=7)
+        # Set sent email flag to True
         user.email_sent = True
+        # Ensure user is not active to prevent from accessing the site till
+        # email verification is completed
         user.is_active = False
+        # Capture User location details
         user.ip_address = get_user_location(self.request)['ip']
         user.user_agent = get_user_location(self.request)['user_agent']
         user.country = get_user_location(self.request)['country']
+        user.city = get_user_location(self.request)['city']
+        # Save user data to database
         user.save()
 
+        # Prepare email notification details
         subject = f"LordSipraSays | Activate Your Account | {form.cleaned_data['email']}"
         to = form.cleaned_data['email']
         from_email = settings.EMAIL_HOST_USER

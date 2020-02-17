@@ -15,6 +15,7 @@ class CustomUser(AbstractBaseUser):
     last_name = models.CharField("Last Name", max_length=255, blank=True, default='', help_text="Enter Your Last Name")
     slug = models.SlugField("Slug", unique=True, max_length=255, default='')
     country = models.CharField("Country", max_length=100, blank=True, default='')
+    city = models.CharField("City", max_length=100, blank=True, default='')
     ip_address = models.CharField("IP Address", max_length=35, blank=True, default='')
     user_agent = models.CharField("User Agent", max_length=255, blank=True, default='')
     image = models.ImageField("Image", upload_to='users', default='default.png', blank=True,

@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from .models import Post, Comment, Contact, PostViewCount
+from users.models import UserLocation
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string

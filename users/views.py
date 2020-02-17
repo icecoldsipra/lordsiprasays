@@ -17,7 +17,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
 from django.contrib.auth.views import (
-    LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+    LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView,
+    PasswordResetCompleteView, PasswordChangeView, PasswordChangeDoneView
 )
 
 
@@ -167,8 +168,21 @@ def password_change(request):
     return render(request, "users/password_change_form.html", context)
 
 
+class UserPasswordChangeView(PasswordChangeView):
+    template_name = 'users/password_change_form.html'
+    form_class = PasswordChangeForm
+    success_url = reverse_lazy('password-change-done')
+
+
+class UserPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = 'users/password_change_done.html'
+    # success_url = reverse_lazy('blog-home')
+
+
 class UserPasswordResetView(PasswordResetView):
     template_name = 'users/password_reset_form.html'
+    email_template_name = 'users/password_reset_email.html'
+    html_email_template_name = 'users/password_reset_email.html'
     success_url = reverse_lazy('password-reset-done')
 
 

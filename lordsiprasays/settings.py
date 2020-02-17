@@ -21,6 +21,8 @@ if not DEBUG:
     # To redirect all HTTP requests to HTTPS
     SECURE_SSL_REDIRECT = True
 
+# Assign a session key to anyone accessing the website
+SESSION_SAVE_EVERY_REQUEST = True
 # Ensures user is logged out as soon as browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Ensures user is logged out after 24 hours

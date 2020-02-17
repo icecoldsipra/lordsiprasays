@@ -36,6 +36,12 @@ class CommentQuerySet(models.QuerySet):
     def rejected_comments(self):
         return self.filter(status="REJECT")
 
+    def live_comments(self):
+        return self.filter(is_live=True)
+
+    def edited_comments(self):
+        return self.filter(is_edited=True)
+
 
 class CommentManager(models.Manager):
     def get_queryset(self):
@@ -47,5 +53,11 @@ class CommentManager(models.Manager):
     def pending_comments(self):
         return self.get_queryset().pending_comments()
 
-    def rejected_comments(self, user):
+    def rejected_comments(self):
         return self.get_queryset().rejected_comments()
+
+    def live_comments(self):
+        return self.get_queryset().live_comments()
+
+    def edited_comments(self):
+        return self.get_queryset().edited_comments()

@@ -5,19 +5,28 @@
 {% block content %}
     <div class="card card-body">
         <div class="text-center">
-            <button class="btn btn-dark" type="button" data-toggle="collapse" data-target="#pendingComments"
-                    aria-expanded="false" aria-controls="pendingComments" style="width: 130px;">
-                PENDING ({{ pending_comments_count }})
+            <button class="btn btn-sm btn-dark mx-1" type="button" data-toggle="collapse" data-target="#pendingComments"
+                    aria-expanded="false" aria-controls="pendingComments" style="width: 90px;">
+                PENDING
+                <div>
+                    ({{ pending_comments_count }})
+                </div>
             </button>
 
-            <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#approvedComments"
-                    aria-expanded="false" aria-controls="approvedComments" style="width: 130px">
-                APPROVED ({{ approved_comments_count }})
+            <button class="btn btn-sm btn-success mx-1" type="button" data-toggle="collapse" data-target="#approvedComments"
+                    aria-expanded="false" aria-controls="approvedComments" style="width: 90px">
+                APPROVED
+                <div>
+                    ({{ approved_comments_count }})
+                </div>
             </button>
 
-            <button class="btn btn-danger" type="button" data-toggle="collapse" data-target="#rejectedComments"
-                    aria-expanded="false" aria-controls="rejectedComments" style="width: 130px">
-                REJECTED ({{ rejected_comments_count }})
+            <button class="btn btn-sm btn-danger mx-1" type="button" data-toggle="collapse" data-target="#rejectedComments"
+                    aria-expanded="false" aria-controls="rejectedComments" style="width: 90px">
+                REJECTED
+                <div>
+                    ({{ rejected_comments_count }})
+                </div>
             </button>
 
         </div>
@@ -40,7 +49,7 @@
                             <td>{{ object.content }}</td>
                             <td>{{ object.owner }}</td>
                             <td><a href="{% url 'blog-detail' object.post.slug %}">{{ object.post }}</a></td>
-                            <td>{{ object.timestamp }}</td>
+                            <td>{{ object.date_created }}</td>
                         </tr>
                     </tbody>
                 {% empty %}
@@ -67,7 +76,7 @@
                             <td><a href="{% url 'blog-detail' object.post.slug %}">{{ object.content }}</a></td>
                             <td>{{ object.owner }}</td>
                             <td><a href="{% url 'blog-detail' object.post.slug %}">{{ object.post }}</a></td>
-                            <td>{{ object.timestamp }}</td>
+                            <td>{{ object.date_created }}</td>
                         </tr>
                     </tbody>
                 {% empty %}
@@ -94,7 +103,7 @@
                             <td>{{ object.content }}</td>
                             <td>{{ object.owner }}</td>
                             <td><a href="{% url 'blog-detail' object.post.slug %}">{{ object.post }}</a></td>
-                            <td>{{ object.timestamp }}</td>
+                            <td>{{ object.date_created }}</td>
                         </tr>
                     </tbody>
                 {% empty %}

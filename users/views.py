@@ -13,11 +13,11 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.http import JsonResponse
 from django.contrib.auth.views import (
-    LoginView, LogoutView, PasswordChangeView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView,
-    PasswordResetCompleteView, PasswordChangeDoneView
+    LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 )
 
 
@@ -70,7 +70,8 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
     model = CustomUser
     template_name = 'users/users_register_modal.html'
     form_class = CustomUserCreationForm
-    # success_message = "An email has been sent to your email ID '%(email)s' for verification."
+    success_message = "An email has been sent to '%(email)s' for verification. " \
+                      "Your account will be activated once email verification is completed."
     success_url = reverse_lazy('users-login')
 
     def form_valid(self, form):
@@ -130,29 +131,40 @@ def users_activate(request, uidb64, token):
         return render(request, 'users/users_login.html')
 
 
-class UserUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     model = CustomUser
     template_name = 'users/users_profile.html'
     form_class = CustomUserChangeForm
     success_message = "Profile updated successfully."
 
-    # To ensure that only the logged in user has access to his content
-    def test_func(self):
-        obj = self.get_object()
-        if self.request.user.username == obj.username:
-            return True
-        return False
+    def get_queryset(self):
+        return CustomUser.objects.filter(username=self.request.user)
 
 
-class UserPasswordChangeView(LoginRequiredMixin, SuccessMessageMixin, PasswordChangeView):
-    model = CustomUser
-    template_name = 'users/password_change_form.html'
-    form_class = PasswordChangeForm
-    success_url = reverse_lazy('password-change-done')
+@login_required
+def password_change(request):
+    from django.contrib.auth import update_session_auth_hash
 
+    form = PasswordChangeForm(user=request.user)
 
-class UserPasswordChangeDoneView(PasswordChangeDoneView):
-    template_name = 'users/password_change_done.html'
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.POST, request.user)
+
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('blog-home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    context = {
+        "form": form,
+    }
+
+    return render(request, "users/password_change_form.html", context)
 
 
 class UserPasswordResetView(PasswordResetView):
@@ -182,6 +194,7 @@ def validate_email(request):
     }
 
     return JsonResponse(data)
+
 
 def validate_username(request):
     username = request.GET.get('username')

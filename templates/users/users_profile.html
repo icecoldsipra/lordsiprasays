@@ -2,10 +2,12 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="container p-0" style="max-width: 500px;">
-        <div class="text-center mb-3">
-            <legend class="border-bottom mb-4">Profile Info</legend>
-            <img src="{{ user.image.url }}" width="320px" height="240px"/>
+    <div class="container p-0" style="max-width: 600px;">
+        <legend class="border-bottom text-center mb-3">User Profile</legend>
+        <div class="row">
+            <div class="col d-flex justify-content-center align-items-center h100 mb-3">
+                <img src="{{ user.image.url }}"/>
+            </div>
         </div>
         <div>
             <form method="POST" enctype="multipart/form-data">

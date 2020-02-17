@@ -5,13 +5,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Post, Comment, Contact
+from .models import Post, Comment, Contact, PostViewCount
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from users.views import get_user_location
 
 
 class BlogListView(ListView):
@@ -156,11 +157,25 @@ def post_create(request):
     return render(request, template, context)
 
 
+def record_view(request, obj=None, slug=None):
+
+    if obj and obj.is_live:
+        PostViewCount.objects.create(
+            post=obj,
+            ip=get_user_location(request)['ip'],
+            country=get_user_location(request)['country'],
+            timestamp=timezone.now()
+        )
+
+
 def post_detail(request, slug):
     # Get post
     post = get_object_or_404(Post.objects.select_related("author"), slug=slug)
     # Extract all approved comments for the specific post
-    comments = Comment.objects.select_related("post", "owner").filter(post=post, status='APPROVED').order_by('timestamp')
+    comments = Comment.objects.select_related("post", "owner").filter(post=post, status='APPROVED', is_live=True).order_by('date_created')
+
+    # Capture IP Address of people visiting the page
+    record_view(request, obj=post)
 
     # Comment form
     if request.method == 'POST':
@@ -169,24 +184,25 @@ def post_detail(request, slug):
         if form.is_valid():
             # Create Comment object but don't save to database yet
             obj = form.save(commit=False)
-            # Assign the current post to the comment
-            obj.post = post
-            # Assign post author to the comment
-            obj.owner = post.author
-            # Save the comment to the database
-            if obj.content:
-                # Save comment to database
-                obj.save()
-                messages.success(
-                    request,
-                    # "Your comment has been sent to Moderator for review. It will be published if approved."
-                    "Your comment was posted successfully."
-                )
 
-            # Reduce view count by one to avoid treating page redirect at time of submitting comment as 1 view
             if post.is_live:
+                # Reduce view count by one to avoid treating page redirect at time of submitting comment as 1 view
                 post.views -= 1
                 post.save()
+
+                # Assign the current post to the comment
+                obj.post = post
+                # Assign post author to the comment
+                obj.owner = post.author
+                # Save the comment to the database
+                if obj.content:
+                    # Save comment to database
+                    obj.save()
+                    messages.success(
+                        request,
+                        # "Your comment has been sent to Moderator for review. It will be published if approved."
+                        "Your comment was posted successfully."
+                    )
 
             # Redirect back to the post-detail page
             return HttpResponseRedirect(request.path_info)
@@ -212,6 +228,53 @@ def post_detail(request, slug):
     }
 
     return render(request, template_name, context)
+
+
+def edit_comment(request, pk):
+    comment = get_object_or_404(Post.objects.select_related("author"), pk=pk)
+    print(comment)
+    # Get form data
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=pk)
+
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.save()
+
+            from_email = form.cleaned_data['email']
+            to = settings.EMAIL_HOST_USER
+            subject = f"LordSipraSays | {form.cleaned_data['subject']} | " + \
+                      f"{from_email}"
+            body = render_to_string(
+                'blog/contact_email.html', {
+                    'user': form.cleaned_data['name'],
+                    'message': form.cleaned_data['message'],
+                }
+            )
+
+            # Send email to registered user
+            send_email = EmailMessage(
+                subject=subject,
+                body=body,
+                from_email=from_email,
+                to=[to],
+            )
+
+            send_email.content_subtype = "html"
+            # send_email.send(fail_silently=False)
+            messages.success(request, "Your email has been sent successfully.")
+            return redirect('blog-home')
+
+    else:
+        form = CommentForm(instance=pk)
+
+    template = 'blog/commit_edit_modal.html'
+    context = {
+        'comment': comment,
+        'form': form
+    }
+
+    return render(request, template, context)
 
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
@@ -278,9 +341,9 @@ def post_update(request, slug):
 
 
 def user_comments(request):
-    approved = Comment.objects.select_related("post", "owner").approved_comments().order_by('-timestamp')
-    pending = Comment.objects.select_related("post", "owner").pending_comments().order_by('-timestamp')
-    reject = Comment.objects.select_related("post", "owner").rejected_comments().order_by('-timestamp')
+    approved = Comment.objects.select_related("post", "owner").approved_comments().order_by('-date_created')
+    pending = Comment.objects.select_related("post", "owner").pending_comments().order_by('-date_created')
+    reject = Comment.objects.select_related("post", "owner").rejected_comments().order_by('-date_created')
 
     template = 'blog/blog_comments.html'
     context = {

@@ -54,6 +54,21 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
 
+class PostViewCount(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    ip = models.CharField(max_length=25, default='', blank=True)
+    country = models.CharField(max_length=50, default='', blank=True)
+    city = models.CharField(max_length=50, default='', blank=True)
+    timestamp = models.DateTimeField(default=None, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Post View Count'
+        verbose_name_plural = 'Post View Counts'
+
+    def __str__(self):
+        return self.ip
+
+
 COMMENT_CHOICES = (
     ("REJECT", "REJECT"),
     ("PENDING", "PENDING"),
@@ -67,7 +82,10 @@ class Comment(models.Model):
     content = models.TextField("Comment:", null=True, blank=True,
         help_text="Comments are moderated. Only those approved by the Moderator will be shown here.")
     status = models.CharField(max_length=10, choices=COMMENT_CHOICES, default="APPROVED")
-    timestamp = models.DateTimeField(auto_now_add=True)
+    is_live = models.BooleanField(default=True)
+    is_edited = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(default=None, null=True, blank=True)
     reviewed_by = models.CharField(max_length=100, blank=True)
     review_time = models.DateTimeField(default=None, null=True, blank=True)
     review_notes = models.TextField(default='', blank=True, null=True)
@@ -80,6 +98,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.owner
+
+    def get_absolute_url(self):
+        return reverse('edit-comment', kwargs={'pk': self.pk})
 
 
 class Contact(models.Model):

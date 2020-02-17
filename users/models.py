@@ -7,8 +7,10 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser):
-    username = models.CharField("Username", unique=True, max_length=25, help_text="Enter a username. It should be unique")
-    email = models.EmailField("Email", unique=True, max_length=100, help_text="Enter Valid Email ID. It should be unique")
+    username = models.CharField("Username", unique=True, max_length=25,
+                                help_text="Enter a username. It should be unique")
+    email = models.EmailField("Email", unique=True, max_length=100,
+                              help_text="Enter Valid Email ID. It should be unique")
     first_name = models.CharField("First Name", max_length=255, help_text="Enter Your First Name")
     last_name = models.CharField("Last Name", max_length=255, blank=True, default='', help_text="Enter Your Last Name")
     slug = models.SlugField("Slug", unique=True, max_length=255, default='')

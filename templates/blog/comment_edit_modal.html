@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div>
+        <!-- The Modal -->
+        <div class="modal fade" id="editCommentModal" role="dialog">
+            <form method="POST" id="editComment-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h4 class="modal-title">Edit Comment</h4>
+                            <button type="button" class="close " data-dismiss="modal">&times;</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            {{ form|crispy }}
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button type="submit" id="editComment" class="btn btn-success">Edit</button>
+                            <button type="button" id="btnClose" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    <script>
+        console.log("In JS");
+        $(document).ready(function(){
+            // Trigger the Comment Edit modal manually
+            $('#editCommentModal').modal('show');
+
+            // Redirect to previous page when user clicks cancel button
+            $('#btnClose').on('click', function() {
+                window.history.back();
+            });
+
+            // capture the Edit button
+            let editBtn = $('#editComment');
+
+            $('#editComment-form').on('submit', function(event){
+                // event.preventDefault();
+
+                $.ajax({
+                    url: "{% url 'edit-comment'  %}",
+                    type: 'POST',
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    data: $('#editComment-form').serialize(),
+
+                    beforeSend: function () {
+                        editBtn.html("Editing...")
+                        editBtn.removeClass("btn-success");
+                        editBtn.addClass("btn-primary");
+                    },
+
+                    success: function(response) {
+
+                    },
+
+                    completed: function() {
+                        $('#editCommentModal').modal('hide');
+                        $('#editComment-form').trigger("reset");
+                        editBtn.html("Edit");
+                        editBtn.removeClass("btn-primary");
+                        editBtn.addClass("btn-success");
+
+                        // $('#editComment').on('click', function() {
+                        //     window.history.back();
+                        // });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock javascript %}

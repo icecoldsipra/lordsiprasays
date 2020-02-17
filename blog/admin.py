@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Post, Comment, Contact
+from .models import Category, Post, Comment, Contact, PostViewCount
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -21,13 +21,22 @@ class PostAdmin(admin.ModelAdmin):
     ordering = ['-date_created']  # Sort in descending order
 
 
+class PostViewCountAdmin(admin.ModelAdmin):
+    list_display = ['ip', 'pk', 'country', 'city', 'post', 'timestamp']
+    list_filter = []
+    search_fields = ['post', 'ip', 'country', 'city']  # Add search bar in Admin panel
+    readonly_fields = ['post', 'ip', 'country', 'city', 'timestamp']
+    # prepopulated_fields = {'slug': ('title', )} # Automatically updates 'slug' field based on title
+    ordering = ['-timestamp']  # Sort in descending order
+
+
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['owner', 'pk', 'content', 'post', 'status', 'timestamp', 'reviewed_by',
-                    'review_time', 'review_notes']
-    list_filter = ['owner', 'post', 'status']
-    search_fields = ['owner', 'post']
-    readonly_fields = ['owner', 'post', 'timestamp', 'reviewed_by', 'review_time']
-    ordering = ['-timestamp']
+    list_display = ['owner', 'pk', 'content', 'post', 'status', 'is_live', 'is_edited', 'date_created', 'date_updated',
+                    'reviewed_by', 'review_time', 'review_notes']
+    list_filter = ['owner', 'post', 'status', 'is_live', 'is_edited']
+    search_fields = ['owner', 'post', 'is_live', 'is_edited']
+    readonly_fields = ['owner', 'post', 'date_created', 'date_updated', 'reviewed_by', 'review_time']
+    ordering = ['-date_created']
 
 
 class ContactAdmin(admin.ModelAdmin):
@@ -41,5 +50,6 @@ class ContactAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Post, PostAdmin)
+admin.site.register(PostViewCount, PostViewCountAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Contact, ContactAdmin)

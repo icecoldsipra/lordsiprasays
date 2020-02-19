@@ -26,6 +26,31 @@ class PostManager(models.Manager):
         return self.get_queryset().user_posts(user)
 
 
+class TrendingPostQuerySet(models.QuerySet):
+    def new_posts(self):
+        return self.filter(is_new=True)
+
+    def hot_posts(self):
+        return self.filter(is_hot=True)
+
+    def featured_posts(self):
+        return self.filter(is_featured=True)
+
+
+class TrendingPostManager(models.Manager):
+    def get_queryset(self):
+        return TrendingPostQuerySet(self.model, using=self._db)
+
+    def new_posts(self):
+        return self.get_queryset().new_posts()
+
+    def hot_posts(self):
+        return self.get_queryset().hot_posts()
+
+    def featured_posts(self):
+        return self.get_queryset().featured_posts()
+
+
 class CommentQuerySet(models.QuerySet):
     def approved_comments(self):
         return self.filter(status="APPROVED")

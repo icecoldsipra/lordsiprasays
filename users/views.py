@@ -5,7 +5,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import CustomUser, UserLocation
+from .models import CustomUser, UserLocation, UserActivation
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.utils.encoding import force_bytes, force_text
@@ -24,7 +24,7 @@ from django.contrib.auth.views import (
 
 def get_user_location(request):
     """
-    This function captures the user's IP Address,User-Agent and Region at the time of signup
+    This function captures the user's IP Address, User-Agent, Country and City
     """
     values = {}
 
@@ -89,20 +89,31 @@ class UserRegisterView(SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
-        # Set email verification deadline as 7 days from registraton date
-        user.activation_deadline = timezone.now() + timezone.timedelta(days=7)
-        # Set sent email flag to True
-        user.email_sent = True
         # Ensure user is not active to prevent from accessing the site till
         # email verification is completed
-        user.is_active = False
-        # Capture User location details
-        user.ip_address = get_user_location(self.request)['ip']
-        user.user_agent = get_user_location(self.request)['user_agent']
-        user.country = get_user_location(self.request)['country']
-        user.city = get_user_location(self.request)['city']
+        is_active = False
         # Save user data to database
         user.save()
+
+        # Update User Activation tracking details
+        UserActivation.objects.get_or_create(
+            user=user,
+            # Set email verification deadline as 7 days from registration date
+            activation_deadline=timezone.now() + timezone.timedelta(days=7),
+            # Set sent email flag to True
+            email_sent=True,
+            created_date=timezone.now(),
+            activation_date=None
+        )
+
+        # Capture User location details
+        UserLocation.objects.get_or_create(
+            user=user,
+            ip=get_user_location(self.request)['ip'],
+            user_agent=get_user_location(self.request)['user_agent'],
+            country=get_user_location(self.request)['country'],
+            city=get_user_location(self.request)['city']
+        )
 
         # Prepare email notification details
         subject = f"LordSipraSays | Activate Your Account | {form.cleaned_data['email']}"
@@ -142,7 +153,9 @@ def users_activate(request, uidb64, token):
     if user and default_token_generator.check_token(user, token):
         user.validation_token = f"{uidb64} : {token}"
         user.is_active = True
-        user.activation_date = timezone.now()
+
+        UserActivation.objects.select_related('user').filter(user=user).update(activation_date=timezone.now())
+
         user.save()
 
         messages.success(request, "Your email has been verified successfully! Please login to access the website.")
@@ -170,7 +183,6 @@ def password_change(request):
 
     if request.method == 'POST':
         form = PasswordChangeForm(request.POST, request.user)
-
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
@@ -184,7 +196,6 @@ def password_change(request):
     context = {
         "form": form,
     }
-
     return render(request, "users/password_change_form.html", context)
 
 
@@ -221,21 +232,17 @@ class UserPasswordResetCompleteView(PasswordResetCompleteView):
 
 def validate_email(request):
     email = request.GET.get('email')
-
     data = {
         'status': 200,
         'is_taken': CustomUser.objects.filter(email__iexact=email).only('email').exists()
     }
-
     return JsonResponse(data)
 
 
 def validate_username(request):
     username = request.GET.get('username')
-
     data = {
         'status': 200,
         'is_taken': CustomUser.objects.filter(username__iexact=username).only('username').exists()
     }
-
     return JsonResponse(data)

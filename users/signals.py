@@ -17,20 +17,6 @@ def protect_superuser(sender, instance, **kwargs):
 
 
 @receiver(user_logged_in)
-def capture_user_ip(sender, user, request, **kwargs):
-    if user.is_authenticated:
-        user.ip_address = get_user_location(request)['ip']
-        user.user_agent = get_user_location(request)['user_agent']
-        user.country = get_user_location(request)['country']
-        user.city = get_user_location(request)['city']
-
-        if user.activation_date is None or user.activation_date == '':
-            user.activation_date = timezone.now()
-
-    user.save()
-
-
-@receiver(user_logged_in)
 def on_user_logged_in(sender, user, **kwargs):
     LoggedInUser.objects.get_or_create(user=user)
 

@@ -1,10 +1,8 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-    <div class="container p-0" style="max-width: 800px;">
+    <div class="container p-0" style="max-width: 1080px;">
         <a class="navbar-brand" href="{{ user.get_absolute_url }}">
             {% if user.is_authenticated %}
                 {{ user.get_username }}
-            {% else %}
-                User
             {% endif %}
         </a>
         <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbarNav"

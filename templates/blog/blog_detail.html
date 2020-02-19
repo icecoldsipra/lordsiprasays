@@ -39,14 +39,14 @@
                 </div>
             {% endif %}
 
-            <div class="card-text">
+            <div class="card-text p-0">
                 {{ post.content|linebreaksbr }}
             </div>
         </div>
 
         {% if post.is_live %}
-            <div class="card-footer">
-                <div class="card card-body mt-2 mb-3">
+            <div class="card-footer p-2">
+                <div class="card card-body border-dark mt-2">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                             {% if user.is_authenticated %}
@@ -56,7 +56,7 @@
                                             {{ form|crispy }}
                                         </div>
                                         <div>
-                                            <button class="btn btn-sm btn-outline-success" type="submit">Submit</button>
+                                            <button class="btn btn-sm btn-outline-success" name="commentBtn" type="submit">Submit</button>
                                         </div>
                                     </div>
                                 </div>
@@ -77,27 +77,28 @@
                 <div>
                     <strong>{{ comments_count }} Comment{{ comments|pluralize }}</strong>
 
-                    <br><br>
+                    <div class="mt-2 py-2">
+                        {% for object in comments %}
+                            <blockquote class="blockquote border border-grey p-2" style="font-size: medium; background-color: white">
+                                <p>{{ object.content|linebreaksbr }}</p>
+                                <footer class="blockquote-footer">
+                                    by
+                                    <cite title="Source Title">
+                                        {{ object.owner }} at {{ object.date_created }}
+                                    </cite>
+                                    <div class='text-right'>
+                                        <button class='btn btn-sm btn-outline-secondary'>Edit</button>
+                                        <button class='btn btn-sm btn-outline-danger'>Delete</button>
+                                    </div>
+                                </footer>
+                            </blockquote>
+                        {% empty %}
+                            <div>
+                                No comments at the moment!
+                            </div>
+                        {% endfor %}
+                    </div>
 
-                    {% for object in comments %}
-                        <blockquote class="blockquote border p-2" style="font-size: medium;">
-                            <p>{{ object.content|linebreaksbr }}</p>
-                            <footer class="blockquote-footer">
-                                by
-                                <cite title="Source Title">
-                                    {{ object.owner }} at {{ object.date_created }}
-                                </cite>
-                                <div class='text-right'>
-                                    <button class='btn btn-sm btn-outline-secondary'>Edit</button>
-                                    <button class='btn btn-sm btn-outline-danger'>Delete</button>
-                                </div>
-                            </footer>
-                        </blockquote>
-                    {% empty %}
-                        <div>
-                            No comments at the moment!
-                        </div>
-                    {% endfor %}
                 </div>
             </div>
         {% endif %}

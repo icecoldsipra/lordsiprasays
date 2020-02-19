@@ -3,27 +3,27 @@
 {% block title %}Comment Moderator{% endblock title %}
 
 {% block content %}
-    <div class="card card-body">
+    <div class="card card-body p-2 my-2">
         <div class="text-center">
             <button class="btn btn-sm btn-dark mx-1" type="button" data-toggle="collapse" data-target="#pendingComments"
-                    aria-expanded="false" aria-controls="pendingComments" style="width: 90px;">
-                PENDING
+                    aria-expanded="false" aria-controls="pendingComments" style="width: 85px;">
+                Pending
                 <div>
                     ({{ pending_comments_count }})
                 </div>
             </button>
 
             <button class="btn btn-sm btn-success mx-1" type="button" data-toggle="collapse" data-target="#approvedComments"
-                    aria-expanded="false" aria-controls="approvedComments" style="width: 90px">
-                APPROVED
+                    aria-expanded="false" aria-controls="approvedComments" style="width: 85px">
+                Approved
                 <div>
                     ({{ approved_comments_count }})
                 </div>
             </button>
 
             <button class="btn btn-sm btn-danger mx-1" type="button" data-toggle="collapse" data-target="#rejectedComments"
-                    aria-expanded="false" aria-controls="rejectedComments" style="width: 90px">
-                REJECTED
+                    aria-expanded="false" aria-controls="rejectedComments" style="width: 85px">
+                Rejected
                 <div>
                     ({{ rejected_comments_count }})
                 </div>

@@ -14,16 +14,9 @@ class CustomUser(AbstractBaseUser):
     first_name = models.CharField("First Name", max_length=255, help_text="Enter Your First Name")
     last_name = models.CharField("Last Name", max_length=255, blank=True, default='', help_text="Enter Your Last Name")
     slug = models.SlugField("Slug", unique=True, max_length=255, default='')
-    country = models.CharField("Country", max_length=100, blank=True, default='')
-    city = models.CharField("City", max_length=100, blank=True, default='')
-    ip_address = models.CharField("IP Address", max_length=35, blank=True, default='')
-    user_agent = models.CharField("User Agent", max_length=255, blank=True, default='')
     image = models.ImageField("Image", upload_to='users', default='default.png', blank=True,
                               help_text="Upload Your Profile Pic")
-    email_sent = models.BooleanField("Email Sent", blank=True, null=True, default=False)
-    activation_deadline = models.DateTimeField("Activation Deadline", blank=True, null=True, default=None)
-    activation_date = models.DateTimeField("Activation Date", blank=True, null=True, default=None)
-    is_active = models.BooleanField("Is Active", default=True)  # Can login
+    is_active = models.BooleanField("Is Active", default=False)  # Can login
     is_staff = models.BooleanField("Is Staff", default=False)  # Admin but non-superuser
     is_superuser = models.BooleanField("Is Superuser", default=False)  # Superuser
     date_joined = models.DateTimeField("Date Joined", default=timezone.now)  # Sets value to current date and time
@@ -89,13 +82,33 @@ class CustomUser(AbstractBaseUser):
         super().save(*args, **kwargs)
 
 
+class UserActivation(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    email_sent = models.BooleanField("Email Sent", blank=True, null=True, default=False)
+    created_date = models.DateTimeField("Created Date", blank=True, null=True, default=None)
+    activation_deadline = models.DateTimeField("Activation Deadline", blank=True, null=True, default=None)
+    activation_date = models.DateTimeField("Activation Date", blank=True, null=True, default=None)
+
+    class Meta:
+        verbose_name = 'User Activation'
+        verbose_name_plural = 'User Activation'
+
+    def __str__(self):
+        return "self.user"
+
+
 class UserLocation(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    ip = models.CharField("IP Address", max_length=20, blank=True, default='')
+    session_key = models.CharField("Session Key", max_length=50, blank=True, default='')
+    ip = models.CharField("IP Address", max_length=50, blank=True, default='')
     user_agent = models.CharField("User Agent", max_length=255, blank=True, default='')
     country = models.CharField("Country", max_length=50, blank=True, default='')
     city = models.CharField("City", max_length=50, blank=True, default='')
     timestamp = models.DateTimeField("Timestamp", auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'User Location'
+        verbose_name_plural = 'User Location'
 
     def __str__(self):
         return f"{self.user} - {self.ip}"
@@ -105,8 +118,12 @@ class UserLocation(models.Model):
 class LoggedInUser(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='logged_in_user')
     # Session keys are 32 characters long
-    session_key = models.CharField(max_length=32, null=True, blank=True)
+    session_key = models.CharField(max_length=50, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Logged In User'
+        verbose_name_plural = 'Logged In Users'
 
     def __str__(self):
         return self.user

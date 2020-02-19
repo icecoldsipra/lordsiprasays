@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Post, Comment, Contact, PostViewCount
+from .models import Post, Comment, ContactMe, PostViewCount
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -179,17 +179,18 @@ def post_detail(request, slug):
     post = get_object_or_404(Post.objects.select_related("author"), slug=slug)
     # Extract all approved comments for the specific post
     comments = Comment.objects.select_related("post", "owner").filter(post=post, status='APPROVED', is_live=True).order_by('date_created')
+    # Extract all tags associated with the post
 
     # Capture IP Address of people visiting the page
     record_view(request, obj=post)
 
     # Comment form
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        comment_form = CommentForm(request.POST)
 
-        if form.is_valid():
+        if comment_form.is_valid():
             # Create Comment object but don't save to database yet
-            obj = form.save(commit=False)
+            obj = comment_form.save(commit=False)
 
             if post.is_live:
                 # Reduce view count by one to avoid treating page redirect at time of submitting comment as 1 view
@@ -212,9 +213,6 @@ def post_detail(request, slug):
 
             # Redirect back to the post-detail page
             return HttpResponseRedirect(request.path_info)
-        # else:
-        #     messages.error(request, form.errors)
-
     else:
         form = CommentForm()
 
@@ -306,7 +304,6 @@ def post_update(request, slug):
         form = PostForm(request.POST, request.FILES, instance=post)
 
         if form.is_valid():
-            print("valid")
             # Create Comment object but don't save to database yet
             obj = form.save(commit=False)
             # Save the post to the database only if user as added any content
@@ -324,9 +321,9 @@ def post_update(request, slug):
                 else:
                     messages.warning(request, "Your post was saved as draft successfully.")
 
-            if obj.is_live:
+            if obj.is_live and obj.views > 0:
                 obj.views -= 1
-                
+
             obj.save()
             # Redirect user back to the post-detail page
             return redirect('blog-detail', slug=slug)
@@ -364,8 +361,8 @@ def user_comments(request):
     return render(request, template, context)
 
 
-class ContactView(SuccessMessageMixin, CreateView):
-    model = Contact
+class ContactMeView(SuccessMessageMixin, CreateView):
+    model = ContactMe
     template_name = 'blog/blog_contact.html'
     success_message = "Your email has been sent successfully."
     success_url = reverse_lazy('blog-home')

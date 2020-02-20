@@ -7,15 +7,18 @@
     {% if user.is_authenticated %}
         {% if user.is_staff or user.is_superuser %}
             <div class="text-center mb-3 p-0">
-                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                                <a href="{% url 'blog-create' %}" >
+                    <button class="btn btn-sm btn-success" type="button">New Post</button>
+                </a>
+
 
                 {% if post.author == request.user %}
-                    <a class="btn btn-sm btn-outline-warning" href="{% url 'blog-update' post.slug %}" type="submit">
-                        Update Post
+                    <a href="{% url 'blog-update' post.slug %}" type="submit">
+                        <button class="btn btn-sm btn-warning" type="button">Update Post</button>
                     </a>
                 {% endif %}
-                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
-                    Review Comments
+                <a href="{% url 'blog-comments' %}">
+                    <button class="btn btn-sm btn-secondary" type="button">Review Comments</button>
                 </a>
             </div>
         {% endif %}
@@ -45,8 +48,8 @@
         </div>
 
         {% if post.is_live %}
-            <div class="card-footer p-2">
-                <div class="card card-body border-dark mt-2">
+            <div class="card-footer px-3">
+                <div class="card card-body border-dark mt-1">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                             {% if user.is_authenticated %}

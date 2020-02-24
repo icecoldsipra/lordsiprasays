@@ -6,17 +6,15 @@
     {% if user.is_authenticated %}
         {% if user.is_staff or user.is_superuser %}
             <div class="text-center mb-3 p-0">
-                <a href="{% url 'blog-create' %}" >
-                    <button class="btn btn-sm btn-success" type="button">New Post</button>
-                </a>
-                <a href="{% url 'blog-comments' %}">
-                    <button class="btn btn-sm btn-secondary" type="button">Review Comments</button>
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                    Review Comments
                 </a>
             </div>
         {% endif %}
     {% endif %}
 
-    <div class="card card-body p-2" style="background-color: lightpink">
+    <div class="card card-body p-2 my-2" style="background-color: lightpink">
         <div class="text-center">
             <button class="btn btn-sm btn-dark" type="button" data-toggle="collapse" data-target="#livePosts"
                     aria-expanded="false" aria-controls="livePosts" style="width: 110px">

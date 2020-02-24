@@ -6,30 +6,45 @@
     {% if user.is_authenticated %}
         {% if user.is_staff or user.is_superuser %}
             <div class="text-center mb-3 p-0">
-                <a href="{% url 'blog-create' %}" >
-                    <button class="btn btn-sm btn-success" type="button">New Post</button>
-                </a>
-                <a href="{% url 'blog-comments' %}">
-                    <button class="btn btn-sm btn-secondary" type="button">Review Comments</button>
+                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                    Review Comments
                 </a>
             </div>
         {% endif %}
     {% endif %}
 
+    <div class="card card-body py-2 my-2" style="background-color: lightpink">
+        <div class="text-center">
+            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+                New
+            </button>
+
+            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+                Featured
+            </button>
+
+            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+                Hot
+            </button>
+
+        </div>
+    </div>
+
     <div class="p-2">
-        {% for post in all_posts %}
+        {% for object in object_list %}
             <div class="list-group">
-                <a href="{% url 'blog-detail' post.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
-                style="background-color: lightyellow;">
-                    <h5 class="mb-1 text-left">{{ post.title }}</h5>
+                <a href="{% url 'blog-detail' object.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
+                style="background-color: lightyellow">
+                    <h5 class="mb-1 text-left">{{ object.title }}</h5>
                     <small class="text-muted">
-                        <strong>Author:</strong> {{ post.author }} |
-                        <strong>Posted:</strong> {{ post.date_posted }} |
-                        <strong>Views:</strong> {{ post.views }} |
-                        <strong>Comments:</strong> {{ post.comments }}
+                        <strong>Author:</strong> {{ object.author }} |
+                        <strong>Posted:</strong> {{ object.date_posted }} |
+                        <strong>Views:</strong> {{ object.views }} |
+                        <strong>Comments:</strong> {{ object.comments }}
                     </small>
                     <hr class="m-1 p-0">
-                    <p class="mb-1">{{ post.content|truncatechars:100 }}</p>
+                    <p class="mb-1">{{ object.content|truncatechars:100 }}</p>
                 </a>
             </div>
         {% empty %}

@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Post, Comment, ContactMe, PostViewCount, TrendingPost
+from .models import Post, Comment, ContactMe, PostViewCount
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -25,15 +25,9 @@ class BlogListView(ListView):
 
 def blog_home(request):
     template = 'blog/blog_home.html'
-    all_posts = Post.objects.select_related("author").live_posts().order_by('-date_posted')
-    featured_posts = TrendingPost.objects.select_related("post").featured_posts().order_by('-date_created')
-    hot_posts = TrendingPost.objects.select_related("post").hot_posts().order_by('-date_created')
-    new_posts = TrendingPost.objects.select_related("post").new_posts().order_by('-date_created')
+    object_list = Post.objects.select_related("author").live_posts().order_by('-date_posted')
     context = {
-        'all_posts': all_posts,
-        'featured_posts': featured_posts,
-        'hot_posts': hot_posts,
-        'new_posts': new_posts
+        'object_list': object_list
     }
     return render(request, template, context)
 

@@ -14,37 +14,121 @@
         {% endif %}
     {% endif %}
 
-    <div class="card card-body py-2 my-2" style="background-color: lightpink">
+    <div class="card card-body py-2 px-2 my-2" style="background-color: lightpink">
         <div class="text-center">
-            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+            <button class="btn btn-sm btn-dark" id="newBotton" type="button"
+                    data-toggle="collapse" data-target="#newPosts"
+                    aria-expanded="false" aria-controls="newPosts"
+                    style="width: 75px">
                 New
             </button>
 
-            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+            <button class="btn btn-sm btn-dark" type="button"
+                    data-toggle="collapse" data-target="#featuredPosts"
+                    aria-expanded="false" aria-controls="featuredPosts"
+                    style="width: 75px">
                 Featured
             </button>
 
-            <button class="btn btn-sm btn-dark" type="button" style="width: 75px">
+            <button class="btn btn-sm btn-dark" type="button"
+                    data-toggle="collapse" data-target="#hotPosts"
+                    aria-expanded="false" aria-controls="hotPosts"
+                    style="width: 75px">
                 Hot
             </button>
+        </div>
 
+        <div class="collapse" id="newPosts">
+            <br>
+            <h5>New Posts:</h5>
+            {% for object in new_posts %}
+                <div class="list-group">
+                    <a href="{% url 'blog-detail' object.post.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
+                    style="background-color: lightyellow">
+                        <h5 class="mb-1 text-left">{{ object.post.title }}</h5>
+                        <small class="text-muted">
+                            <strong>Author:</strong> {{ object.post.author }} |
+                            <strong>Posted:</strong> {{ object.post.date_posted }} |
+                            <strong>Views:</strong> {{ object.post.views }} |
+                            <strong>Comments:</strong> {{ object.post.comments }}
+                        </small>
+                        <hr class="m-1 p-0">
+                        <p class="mb-1">{{ object.post.content|truncatechars:75 }}</p>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="text-center mt-4">
+                    <h5>No Posts Live!</h5>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="collapse" id="featuredPosts">
+            <br>
+            <h5>Featured Posts:</h5>
+            {% for object in featured_posts %}
+                <div class="list-group">
+                    <a href="{% url 'blog-detail' object.post.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
+                    style="background-color: lightyellow">
+                        <h5 class="mb-1 text-left">{{ object.post.title }}</h5>
+                        <small class="text-muted">
+                            <strong>Author:</strong> {{ object.post.author }} |
+                            <strong>Posted:</strong> {{ object.post.date_posted }} |
+                            <strong>Views:</strong> {{ object.post.views }} |
+                            <strong>Comments:</strong> {{ object.post.comments }}
+                        </small>
+                        <hr class="m-1 p-0">
+                        <p class="mb-1">{{ object.post.content|truncatechars:75 }}</p>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="text-center mt-4">
+                    <h5>No Posts Live!</h5>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="collapse" id="hotPosts">
+            <br>
+            <h5>Hot Posts:</h5>
+            {% for object in hot_posts %}
+                <div class="list-group">
+                    <a href="{% url 'blog-detail' object.post.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
+                    style="background-color: lightyellow">
+                        <h5 class="mb-1 text-left">{{ object.post.title }}</h5>
+                        <small class="text-muted">
+                            <strong>Author:</strong> {{ object.post.author }} |
+                            <strong>Posted:</strong> {{ object.post.date_posted }} |
+                            <strong>Views:</strong> {{ object.post.views }} |
+                            <strong>Comments:</strong> {{ object.post.comments }}
+                        </small>
+                        <hr class="m-1 p-0">
+                        <p class="mb-1">{{ object.post.content|truncatechars:75 }}</p>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="text-center mt-4">
+                    <h5>No Posts Live!</h5>
+                </div>
+            {% endfor %}
         </div>
     </div>
 
     <div class="p-2">
-        {% for object in object_list %}
+        <h5>All Posts:</h5>
+        {% for object in hot_posts %}
             <div class="list-group">
-                <a href="{% url 'blog-detail' object.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
+                <a href="{% url 'blog-detail' object.post.slug %}" class="list-group-item list-group-item-action border-dark mb-2 p-2"
                 style="background-color: lightyellow">
-                    <h5 class="mb-1 text-left">{{ object.title }}</h5>
+                    <h5 class="mb-1 text-left">{{ object.post.title }}</h5>
                     <small class="text-muted">
-                        <strong>Author:</strong> {{ object.author }} |
-                        <strong>Posted:</strong> {{ object.date_posted }} |
-                        <strong>Views:</strong> {{ object.views }} |
-                        <strong>Comments:</strong> {{ object.comments }}
+                        <strong>Author:</strong> {{ object.post.author }} |
+                        <strong>Posted:</strong> {{ object.post.date_posted }} |
+                        <strong>Views:</strong> {{ object.post.views }} |
+                        <strong>Comments:</strong> {{ object.post.comments }}
                     </small>
                     <hr class="m-1 p-0">
-                    <p class="mb-1">{{ object.content|truncatechars:100 }}</p>
+                    <p class="mb-1">{{ object.post.content|truncatechars:75 }}</p>
                 </a>
             </div>
         {% empty %}
@@ -55,3 +139,17 @@
     </div>
 
 {% endblock content %}
+
+{% block javascript %}
+    <script>
+        $(document).ready(function(){
+
+            $('#newButton').on('click', function() {
+                alert("Button Clicked");
+                $('#featuredPosts').collapse.hide();
+                $('#hotPosts').collapse('hide');
+            });
+
+        });
+    </script>
+{% endblock javascript %}

@@ -2,26 +2,26 @@
     <div class="container p-0" style="max-width: 1080px;">
         <div class="navbar-nav text-capitalize mx-auto" style="white-space: nowrap">
             <div class="row">
-                <div class="col px-1">
+                <div class="col px-2">
                     <a class="nav-item nav-link" href="{% url 'blog-home' %}">Home</a>
                 </div>
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user.is_superuser %}
-                        <div class="col px-1">
+                        <div class="col px-2">
                             <a class="nav-item nav-link" href="{% url 'blog-posts' %}">My Posts</a>
                         </div>
-                        <div class="col px-1">
+                        <div class="col px-2">
                             <a class="nav-item nav-link" href="{% url 'admin:index' %}">Admin</a>
                         </div>
                     {% endif %}
-                    <div class="col px-1">
+                    <div class="col px-2">
                         <a class="nav-item nav-link" href="{% url 'users-logout' %}">Logout</a>
                     </div>
                 {% else %}
-                    <div class="col px-1">
+                    <div class="col px-2">
                         <a class="nav-item nav-link" href="{% url 'users-login' %}">Login</a>
                     </div>
-                    <div class="col px-1">
+                    <div class="col px-2">
                         <a class="nav-item nav-link" href="{% url 'users-register' %}">Register</a>
                     </div>
                 {% endif %}

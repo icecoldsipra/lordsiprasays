@@ -6,8 +6,8 @@
     {% if user.is_authenticated %}
         {% if user.is_staff or user.is_superuser %}
             <div class="text-center mb-3 p-0">
-                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
-                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                <a class="btn btn-sm btn-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-secondary" href="{% url 'blog-comments' %}" type="button">
                     Review Comments
                 </a>
             </div>

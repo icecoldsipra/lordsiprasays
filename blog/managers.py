@@ -3,13 +3,22 @@ from django.db import models
 
 class PostQuerySet(models.QuerySet):
     def live_posts(self):
-        return self.filter(is_live=True)
+        return self.filter(is_live=True).order_by('-date_posted')
 
     def hidden_posts(self):
         return self.filter(is_live=False)
 
     def user_posts(self, user):
         return self.filter(author=user)
+
+    def new_posts(self):
+        return self.filter(is_live=True).order_by('-date_posted')
+
+    def hot_posts(self):
+        return self.filter(is_hot=True).order_by('-date_posted')
+
+    def featured_posts(self):
+        return self.filter(is_featured=True).order_by('-date_posted')
 
 
 class PostManager(models.Manager):
@@ -24,22 +33,6 @@ class PostManager(models.Manager):
 
     def user_posts(self, user):
         return self.get_queryset().user_posts(user)
-
-
-class TrendingPostQuerySet(models.QuerySet):
-    def new_posts(self):
-        return self.filter(is_new=True)
-
-    def hot_posts(self):
-        return self.filter(is_hot=True)
-
-    def featured_posts(self):
-        return self.filter(is_featured=True)
-
-
-class TrendingPostManager(models.Manager):
-    def get_queryset(self):
-        return TrendingPostQuerySet(self.model, using=self._db)
 
     def new_posts(self):
         return self.get_queryset().new_posts()

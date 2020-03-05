@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Post, Comment, ContactMe, PostViewCount, TrendingPost
+from .models import Category, Post, Comment, ContactMe, PostViewCount
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -16,23 +16,11 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     model = Post
-    list_display = ['title', 'pk', 'slug', 'author', 'views', 'comments', 'is_live', 'image', 'date_created',
-                    'date_posted', 'date_updated']
-    list_filter = ['title', 'author', 'is_live']
-    search_fields = ['title', 'author', 'is_live']  # Add search bar in Admin panel
+    list_display = ['title', 'pk', 'slug', 'author', 'views', 'comments', 'is_live', 'is_hot', 'is_featured',
+                    'image', 'date_created', 'date_posted', 'date_updated']
+    list_filter = ['title', 'author', 'is_live', 'is_hot', 'is_featured']
+    search_fields = ['title', 'author', 'is_live', 'is_hot', 'is_featured']  # Add search bar in Admin panel
     readonly_fields = ['author', 'views', 'comments', 'date_created', 'date_posted', 'date_updated']
-    # prepopulated_fields = {'slug': ('title', )} # Automatically updates 'slug' field based on title
-    ordering = ['-date_created']  # Sort in descending order
-    # Control whether the full count of objects should be displayed on a filtered admin page
-    show_full_result_count = False
-
-
-class TrendingPostAdmin(admin.ModelAdmin):
-    model = TrendingPost
-    list_display = ['post', 'pk', 'slug', 'is_new', 'is_hot', 'is_featured', 'date_created', 'date_updated']
-    list_filter = ['post', 'is_new', 'is_hot', 'is_featured']
-    search_fields = ['post', 'is_new', 'is_hot', 'is_featured']  # Add search bar in Admin panel
-    readonly_fields = ['post', 'date_created', 'date_updated']
     # prepopulated_fields = {'slug': ('title', )} # Automatically updates 'slug' field based on title
     ordering = ['-date_created']  # Sort in descending order
     # Control whether the full count of objects should be displayed on a filtered admin page
@@ -80,4 +68,3 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(PostViewCount, PostViewCountAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(ContactMe, ContactMeAdmin)
-admin.site.register(TrendingPost, TrendingPostAdmin)

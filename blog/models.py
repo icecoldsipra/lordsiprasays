@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.shortcuts import reverse
 from django.utils.text import slugify
-from .managers import PostManager, CommentManager, TrendingPostManager
+from .managers import PostManager, CommentManager
 
 
 class Category(models.Model):
@@ -45,6 +45,8 @@ class Post(models.Model):
     views = models.PositiveIntegerField(default=0)
     comments = models.PositiveIntegerField(default=0)
     is_live = models.BooleanField("Publish Post", default=False)
+    is_hot = models.BooleanField("Hot Post", default=False)
+    is_featured = models.BooleanField("Featured Post", default=False)
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     date_posted = models.DateTimeField(default=None, null=True, blank=True)
     date_updated = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -73,30 +75,6 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = self._get_unique_slug()
-        super().save(*args, **kwargs)
-
-
-class TrendingPost(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    slug = models.SlugField(max_length=255)
-    is_new = models.BooleanField("New Post", default=False)
-    is_hot = models.BooleanField("Hot Post", default=False)
-    is_featured = models.BooleanField("Featured Post", default=False)
-    date_created = models.DateTimeField("Date Created", auto_now_add=True)
-    date_updated = models.DateTimeField("Date Updated", auto_now=True)
-
-    objects = TrendingPostManager()
-
-    class Meta:
-        verbose_name = 'Post - Trending'
-        verbose_name_plural = 'Post - Trending'
-
-    def __str__(self):
-        return self.post.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = self.post.slug
         super().save(*args, **kwargs)
 
 

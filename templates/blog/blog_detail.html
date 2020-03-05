@@ -7,14 +7,14 @@
     {% if user.is_authenticated %}
         {% if user.is_staff or user.is_superuser %}
             <div class="text-center mb-3 p-0">
-                <a class="btn btn-sm btn-outline-success" href="{% url 'blog-create' %}" type="button">New Post</a>
+                <a class="btn btn-sm btn-success" href="{% url 'blog-create' %}" type="button">New Post</a>
 
                 {% if post.author == request.user %}
-                    <a class="btn btn-sm btn-outline-warning" href="{% url 'blog-update' post.slug %}" type="submit">
+                    <a class="btn btn-sm btn-warning" href="{% url 'blog-update' post.slug %}" type="submit">
                         Update Post
                     </a>
                 {% endif %}
-                <a class="btn btn-sm btn-outline-secondary" href="{% url 'blog-comments' %}" type="button">
+                <a class="btn btn-sm btn-secondary" href="{% url 'blog-comments' %}" type="button">
                     Review Comments
                 </a>
             </div>
@@ -87,7 +87,7 @@
                                         {{ object.owner }} at {{ object.date_created }}
                                     </cite>
                                     <div class='text-right'>
-                                        <button class='btn btn-sm btn-outline-secondary'>Edit</button>
+                                        <a href="#" class='btn btn-sm btn-outline-secondary'>Edit</a>
                                         <button class='btn btn-sm btn-outline-danger'>Delete</button>
                                     </div>
                                 </footer>

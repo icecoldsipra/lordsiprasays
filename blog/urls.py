@@ -11,7 +11,7 @@ urlpatterns = [
     path('posts/<slug:slug>/', post_detail, name='blog-detail'),
     path('posts/<slug:slug>/update/', post_update, name='blog-update'),
     path('comments/', user_comments, name='blog-comments'),
-    # path('comments/<int:pk>/',edit_comment, name='edit-comment'),
+    path('comments/<int:pk>/', edit_comment, name='edit-comment'),
     path('about/', about_page, name='blog-about'),
     path('contact/', contact_admin, name='blog-contact'),
 ]

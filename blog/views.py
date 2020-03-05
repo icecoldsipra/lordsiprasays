@@ -1,11 +1,7 @@
-from django.views.generic import ListView, CreateView, UpdateView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Post, Comment, ContactMe, PostViewCount, TrendingPost
+from .models import Post, Comment, ContactMe, PostViewCount
 from .forms import CommentForm, ContactForm, PostForm
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -15,20 +11,12 @@ from django.contrib import messages
 from users.views import get_user_location
 
 
-"""
-class BlogListView(ListView):
-    model = Post
-    template_name = 'blog/blog_home.html'
-    queryset = Post.objects.select_related("author").live_posts().order_by('-date_posted')
-"""
-
-
 def blog_home(request):
     template = 'blog/blog_home.html'
-    all_posts = Post.objects.select_related("author").live_posts().order_by('-date_posted')
-    new_posts = TrendingPost.objects.select_related("post").new_posts().order_by('-date_created')
-    hot_posts = TrendingPost.objects.select_related("post").hot_posts().order_by('-date_created')
-    featured_posts = TrendingPost.objects.select_related("post").featured_posts().order_by('-date_created')
+    all_posts = Post.objects.select_related("author").live_posts()
+    new_posts = all_posts.new_posts()
+    hot_posts = all_posts.hot_posts()
+    featured_posts = all_posts.featured_posts()
     context = {
         'all_posts': all_posts,
         'new_posts': new_posts,
@@ -36,26 +24,6 @@ def blog_home(request):
         'featured_posts': featured_posts,
     }
     return render(request, template, context)
-
-
-"""
-class PostListView(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'blog/blog_posts.html'
-
-    def get_context_data(self, **kwargs):
-        live_posts = Post.objects.select_related("author").filter(author=self.request.user, is_live=True).order_by('-date_posted')
-        hidden_posts = Post.objects.select_related("author").filter(author=self.request.user, is_live=False).order_by('-date_created')
-
-        context = super().get_context_data(**kwargs)
-
-        context['live_posts'] = live_posts
-        context['live_posts_count'] = live_posts.count()
-        context['hidden_posts'] = hidden_posts
-        context['hidden_posts_count'] = hidden_posts.count()
-
-        return context
-"""
 
 
 @login_required
@@ -74,59 +42,6 @@ def user_posts(request):
     }
 
     return render(request, template, context)
-
-
-"""
-class LivePostListView(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'blog/blog_posts_live_hidden.html'
-
-    def get_context_data(self, **kwargs):
-        object_list = Post.objects.select_related("author").filter(author=self.request.user, is_live=True).order_by('-date_created')
-
-        context = super().get_context_data(**kwargs)
-
-        context['object_list'] = object_list
-        context['object_list_count'] = object_list.count()
-
-        return context
-
-
-class HiddenPostListView(LoginRequiredMixin, ListView):
-    model = Post
-    template_name = 'blog/blog_posts_live_hidden.html'
-
-    def get_context_data(self, **kwargs):
-        object_list = Post.objects.select_related("author").filter(author=self.request.user, is_live=False).order_by('-date_posted')
-
-        context = super().get_context_data(**kwargs)
-        context['object_list'] = object_list
-        context['object_list_count'] = object_list.count()
-        return context
-
-
-class PostCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    model = Post
-    template_name = 'blog/blog_create.html'
-    success_message = "Post '%(title)s' was published successfully."
-    success_url = reverse_lazy('blog-home')
-    fields = ['title', 'tags', 'image', 'is_live', 'content']
-
-    def form_valid(self, form):
-        post = form.save(commit=False)
-        # Capture author of post as current logged in user
-        post.author = self.request.user
-        # If author does not add any content to the post, it is automatically
-        # saved as hidden.
-        if not post.content:
-            post.is_live = False
-        # If user wants to take post live, update the date posted time
-        if post.is_live:
-            post.date_posted = timezone.now()
-        # Finally, save post details to database
-        post.save()
-        return super().form_valid(form)
-"""
 
 
 @login_required
@@ -169,7 +84,10 @@ def post_create(request):
 
 
 def record_view(request, obj=None, slug=None):
-
+    """
+    This function adds an entry in the PostViewCount table
+    whenever a user accesses the particular web page.
+    """
     if obj and obj.is_live:
         PostViewCount.objects.create(
             post=obj,
@@ -241,42 +159,18 @@ def post_detail(request, slug):
 
 
 def edit_comment(request, pk):
-    comment = get_object_or_404(Post.objects.select_related("author"), pk=pk)
+    post = get_object_or_404(Post.objects.select_related("author"), pk=pk)
+    comment = get_object_or_404(Comment.objects.select_related("owner", "post"), pk=pk)
     print(comment)
     # Get form data
     if request.method == 'POST':
-        form = CommentForm(request.POST, instance=pk)
+        form = CommentForm(request.POST, instance=comment)
 
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.save()
-
-            from_email = form.cleaned_data['email']
-            to = settings.EMAIL_HOST_USER
-            subject = f"LordSipraSays | {form.cleaned_data['subject']} | " + \
-                      f"{from_email}"
-            body = render_to_string(
-                'blog/contact_email.html', {
-                    'user': form.cleaned_data['name'],
-                    'message': form.cleaned_data['message'],
-                }
-            )
-
-            # Send email to registered user
-            send_email = EmailMessage(
-                subject=subject,
-                body=body,
-                from_email=from_email,
-                to=[to],
-            )
-
-            send_email.content_subtype = "html"
-            # send_email.send(fail_silently=False)
-            messages.success(request, "Your email has been sent successfully.")
-            return redirect('blog-home')
-
+            # obj = form.save(commit=False)
+            form.save()
     else:
-        form = CommentForm(instance=pk)
+        form = CommentForm(instance=comment)
 
     template = 'blog/commit_edit_modal.html'
     context = {
@@ -285,20 +179,6 @@ def edit_comment(request, pk):
     }
 
     return render(request, template, context)
-
-
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
-    model = Post
-    template_name = 'blog/blog_update.html'
-    success_message = "Post '%(title)s' was updated successfully."
-    success_url = reverse_lazy('blog-home')
-    fields = ['title', 'tags', 'image', 'is_live', 'content']
-
-    def test_func(self):
-        obj = self.get_object()
-        if self.request.user == obj.author:
-            return True
-        return False
 
 
 @login_required
@@ -365,39 +245,6 @@ def user_comments(request):
     }
 
     return render(request, template, context)
-
-
-class ContactMeView(SuccessMessageMixin, CreateView):
-    model = ContactMe
-    template_name = 'blog/blog_contact.html'
-    success_message = "Your email has been sent successfully."
-    success_url = reverse_lazy('blog-home')
-    fields = ['name', 'email', 'subject', 'message']
-
-    def form_valid(self, form):
-        from_email = form.cleaned_data['email']
-        to = settings.EMAIL_HOST_USER
-        subject = f"LordSipraSays | {form.cleaned_data['subject']} | " + \
-                  f"{from_email}"
-        body = render_to_string(
-            'blog/contact_email.html', {
-                'user': form.cleaned_data['name'],
-                'message': form.cleaned_data['message'],
-            }
-        )
-
-        # Send email to registered user
-        send_email = EmailMessage(
-            subject=subject,
-            body=body,
-            from_email=from_email,
-            to=[to],
-        )
-
-        send_email.content_subtype = "html"
-        send_email.send(fail_silently=False)
-
-        return super().form_valid(form)
 
 
 def contact_admin(request):

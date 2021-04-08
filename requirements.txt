@@ -1,7 +1,7 @@
 asgiref==3.2.3
 certifi==2019.11.28
 chardet==3.0.4
-Django==3.0.3
+Django==3.0.14
 django-admin-honeypot==1.1.0
 django-crispy-forms==1.8.1
 django-debug-toolbar==2.2
